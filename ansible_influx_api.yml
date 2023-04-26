@@ -1,0 +1,28 @@
+   - name: Count
+    shell: "mysql -s -e 'SELECT COUNT(*)-5 FROM information_schema.SCHEMATA;'"
+    register: bbdd_mysql_server
+
+  - debug: 
+      msg: "{{ bbdd_mysql_server.stdout }}"
+
+  - set_fact:
+        total_result_bd: "{{ ansible_play_hosts_all|
+                          map('extract', hostvars, ['bbdd_mysql_server', 'stdout'])|
+                          map('int')|
+                          sum }}"
+    run_once: true
+  - debug:
+        var: total_result_bd
+    run_once: true
+    
+  - name: Api send data 
+    uri:
+      url: https://databaseurl:8086/write?db=influxdb
+      method: POST
+      user: user111
+      password: asassasa
+      validate_certs: false
+      body: "Count,valor=Number_bd value={{ total_result_bd }}"
+      status_code: 204
+    run_once: true
+    delegate_to: localhost
