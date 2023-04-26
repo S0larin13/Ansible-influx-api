@@ -1,2 +1,2 @@
 # Ansible-influx-api
-Ansible count send influx
+In this playbook we count all mysql in group server. And data is sended by api ansible.
